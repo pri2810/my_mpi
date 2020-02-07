@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#  my_prun : Bash Script to run on all processors
+#  ppatel27  Prithvi V Patel
+#  CSC548 Spring 2020 HW2 Problem 1.
+#  Spec: https://pages.github.ncsu.edu/fmuelle/parsys20/hw/hw2/
+
+#  Usage: ./my_prun numberProcessors [CMD]
+
+[ $# -ne 2 ] && { echo "Usage: $0 [num_Processors] [cmd]"; exit 1; }
+
+# Set some variables
+CMD=$2
+NODEFILE=nodefile.txt
+PWD=$(pwd)
+
+# Parse $SLURM_NODELIST into an iterable list of node names
+echo $SLURM_NODELIST | tr -d c | tr -d [ | tr -d ] | perl -pe 's/(\d+)-(\d+)/join(",",$1..$2)/eg' | awk 'BEGIN { RS=","} { print "c"$1 }' > $NODEFILE
+
+# For each item in the nodefile, connect via ssh and run the cmd.
+# The -n parameter is important or ssh will consume the rest 
+# of the loop list in stdin.
+# Increment rank passed to the code for each node
+
+total_rank=$1
+modulo=$(( $total_rank  % 2 ))
+if [ $modulo != 0 ]
+then
+  echo "Usage: $0 [num_Processors] [cmd]";
+	echo "Number of processors should be even";
+  exit 1;
+fi
+
+rank=0
+for curNode in `cat $NODEFILE`; do
+  if [ $rank == $total_rank ]
+	then
+		break
+	fi
+  ssh -n $curNode "cd $PWD;$CMD $NODEFILE $total_rank $rank" & pid[$rank]=$!
+  (( rank++ ))
+done
+
+#wait for each ssh / corresponding CMD to finish executing before exiting
+rank=0
+for curNode in `cat $NODEFILE`; do
+  if [ $rank == $total_rank ]
+	then
+		break
+	fi
+  wait ${pid[$rank]}
+  (( rank++ ))
+done
+
+rm $NODEFILE

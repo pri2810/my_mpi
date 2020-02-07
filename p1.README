@@ -1,0 +1,28 @@
+/*
+ * ppatel27 Prithvi V Patel
+ * p1.README - Custom MPI library
+ * CSC548 Spring 2020 HW2 Problem 1.
+ * Spec: https://pages.github.ncsu.edu/fmuelle/parsys20/hw/hw2/
+ *
+ */
+ 
+ Steps to run the program:
+ - reserve 8 nodes and 8 processors(one per node)
+ - Copy my_rtt.c, my_mpi.c, my_mpi.h, p1.Makefile and my_prun to a directory.
+ - On the master compute node, run following commands
+ 		- make -f p1.Makefile
+ 		- ./my_prun 8 my_rtt OR as ./my_prun [# of procs] ./my_rtt
+ - The output would be printed by master node on stdout
+ 
+ Note: The entire logic of my_rtt.c is same and  while the changes made to my_rtt.c:
+ 		- The buffer sent everytime was statically allocated, but now it is dynamically allocated.
+
+ 
+ Observations pertaining to RTT with custom my_mpi.h:
+ Note: std: standard deviation.
+ - For smaller message sizes, the actual MPI calls took less than 100 microseconds, while 
+   the custom library takes thousands of micro seconds.
+ - Also, for the larger message sizes, there is almost a ratio of 10 between the custom library 
+   and actual MPI calls.
+ - Also, as should have been expected, there is an increase in RTT as message size increases.
+ - Thus, the MPI library has more faster communication ways than the normal socket programming construct has.
