@@ -1,4 +1,9 @@
- 
+My MPI implementation for MPI_Init, MPI_Send, MPI_Receive, MPI_Sendrecv, MPI_Barrier and MPI_Finalize
+using Socket Programming and pthreads(where each node runs a server thread).
+
+
+ Require a cluster with atleast even number of nodes where slurm can get information regarding all the nodes
+ that are reserved.
  Steps to run the program:
  - reserve 8 nodes and 8 processors(one per node)
  - Copy my_rtt.c, my_mpi.c, my_mpi.h, p1.Makefile and my_prun to a directory.
